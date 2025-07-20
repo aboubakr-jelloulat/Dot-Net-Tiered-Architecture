@@ -141,6 +141,6 @@ namespace ContactsBusinessLayer
             return clsContactDataAccess.IsContactExist(ID);
         }
 
-
     }
 }
+

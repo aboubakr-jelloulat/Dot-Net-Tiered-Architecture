@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using ContactsBusinessLayer;
+using CountryBusinessLayer;
 
 namespace ContactsDataAccesLayer
 {
@@ -124,8 +125,30 @@ namespace ContactsDataAccesLayer
             }
         }
 
+
+
+        // Country Methods
+
+        static void FindCountryByID(int ID)
+        {
+            clsCountry Country1 = clsCountry.Find(ID);
+
+            if (Country1 != null)
+            {
+                Console.WriteLine(Country1.CountryName);
+            }
+            else
+            {
+                Console.WriteLine("Country [" + ID + "] Not found!");
+            }
+
+        }
+
         static void Main(string[] args)
         {
+            // ***********   Contact Methods  ***********
+
+
             // FindContact(2); 
 
             // AddNewContact();
@@ -136,8 +159,15 @@ namespace ContactsDataAccesLayer
 
             //ListContacts();
 
-
             // isContactExist(100);
+
+
+            //  ***********   Country Methods   ***********
+
+            FindCountryByID(93);
+
+            //FindCountryByName("Morocco");
+
 
             Console.ReadKey();
         }

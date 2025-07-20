@@ -4,3 +4,9 @@ C:\Users\HP\Desktop\arch\Dot Net Tiered Architecture\ContactsDataAccesLayer\obj\
 C:\Users\HP\Desktop\arch\Dot Net Tiered Architecture\ContactsDataAccesLayer\obj\Debug\ContactsDataAccesLayer.csproj.CoreCompileInputs.cache
 C:\Users\HP\Desktop\arch\Dot Net Tiered Architecture\ContactsDataAccesLayer\obj\Debug\ContactsDataAccesLayer.dll
 C:\Users\HP\Desktop\arch\Dot Net Tiered Architecture\ContactsDataAccesLayer\obj\Debug\ContactsDataAccesLayer.pdb
+C:\Users\HP\Desktop\Architecture 3-tier\Dot Net Tiered Architecture\ContactsDataAccesLayer\bin\Debug\ContactsDataAccesLayer.dll
+C:\Users\HP\Desktop\Architecture 3-tier\Dot Net Tiered Architecture\ContactsDataAccesLayer\bin\Debug\ContactsDataAccesLayer.pdb
+C:\Users\HP\Desktop\Architecture 3-tier\Dot Net Tiered Architecture\ContactsDataAccesLayer\obj\Debug\ContactsDataAccesLayer.csproj.AssemblyReference.cache
+C:\Users\HP\Desktop\Architecture 3-tier\Dot Net Tiered Architecture\ContactsDataAccesLayer\obj\Debug\ContactsDataAccesLayer.csproj.CoreCompileInputs.cache
+C:\Users\HP\Desktop\Architecture 3-tier\Dot Net Tiered Architecture\ContactsDataAccesLayer\obj\Debug\ContactsDataAccesLayer.dll
+C:\Users\HP\Desktop\Architecture 3-tier\Dot Net Tiered Architecture\ContactsDataAccesLayer\obj\Debug\ContactsDataAccesLayer.pdb
