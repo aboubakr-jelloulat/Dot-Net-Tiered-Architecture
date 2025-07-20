@@ -43,9 +43,69 @@ namespace CountryBusinessLayer
             {
                 return null; // Not found
             }
+        }
 
+        public static clsCountry Find(string CountryName)
+        {
+            int CountryID = -1;
+            string CountryNameFound = "";
+            // Call Data Access Layer to find the country by Name
+            if (clsCountryDataAccess.GetCountryInfoByName(CountryName, ref CountryNameFound))
+            {
+                return new clsCountry(CountryID, CountryNameFound);
+            }
+            else
+            {
+                return null; // Not found
+            }
 
         }
+        public static bool isCountryExist(int ID)
+        {
+            return clsCountryDataAccess.IsCountryExist(ID);
+        }
+
+        public static bool isCountryExist(string CountryName)
+        {
+            return clsCountryDataAccess.IsCountryExist(CountryName);
+        }
+
+        private bool _AddNewCountry()
+        {
+           this.ID = clsCountryDataAccess.AddNewCountry(this.CountryName);
+            return this.ID > 0;
+        }
+
+        private bool _UpdateCountry()
+        {
+            return clsCountryDataAccess.UpdateCountry(this.ID, this.CountryName);
+        }
+
+        public bool Save()
+        {
+            switch (Mode)
+            {
+                case enMode.AddNew:
+                    return _AddNewCountry();
+                case enMode.Update:
+                    return _UpdateCountry();
+                default:
+                    throw new InvalidOperationException("Unknown mode");
+            }
+
+        }
+
+        public static DataTable GetAllCountries()
+        {
+            return clsCountryDataAccess.GetAllCountries();
+
+        }
+
+        public static bool DeleteCountry(int ID)
+        {
+            return clsCountryDataAccess.DeleteCountry(ID);
+        }
+
 
     }
 }
