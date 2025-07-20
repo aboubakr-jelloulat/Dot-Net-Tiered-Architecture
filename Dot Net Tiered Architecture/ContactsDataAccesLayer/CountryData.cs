@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Runtime.Remoting.Messaging;
-using ContactsDataAccessLayer;
-using Microsoft.Win32.SafeHandles;
 
-namespace CountrysDataAccesLayer
+namespace ContactsDataAccessLayer
 {
-    public class clsCountryDataAccess
+    public class clsCountryData
     {
-        public static bool GetCountryInfoByID(int ID, ref string CountryName)
+        public static bool GetCountryInfoByID(int ID, ref string CountryName,
+                                            ref string Code, ref string PhoneCode)
         {
             bool isFound = false;
 
@@ -19,18 +17,49 @@ namespace CountrysDataAccesLayer
 
             SqlCommand command = new SqlCommand(query, connection);
 
-            command.Parameters.AddWithValue("CountryID", ID);
+            command.Parameters.AddWithValue("@CountryID", ID);
 
             try
             {
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
+
                 if (reader.Read())
                 {
+
+                    // The record was found
                     isFound = true;
+
                     CountryName = (string)reader["CountryName"];
+
+                    if (reader["Code"] != DBNull.Value)
+                    {
+                        Code = (string)reader["Code"];
+                    }
+                    else
+                    {
+                        Code = "";
+                    }
+
+                    if (reader["PhoneCode"] != DBNull.Value)
+                    {
+                        PhoneCode = (string)reader["PhoneCode"];
+                    }
+                    else
+                    {
+                        PhoneCode = "";
+                    }
+
                 }
+                else
+                {
+                    // The record was not found
+                    isFound = false;
+                }
+
                 reader.Close();
+
+
             }
             catch (Exception ex)
             {
@@ -46,7 +75,8 @@ namespace CountrysDataAccesLayer
         }
 
 
-        public static bool GetCountryInfoByName(string CountryName, ref string CountryNameFound)
+        public static bool GetCountryInfoByName(string CountryName, ref int ID,
+                                                ref string Code, ref string PhoneCode)
         {
             bool isFound = false;
 
@@ -56,20 +86,49 @@ namespace CountrysDataAccesLayer
 
             SqlCommand command = new SqlCommand(query, connection);
 
-            command.Parameters.AddWithValue("CountryName", CountryName);
+            command.Parameters.AddWithValue("@CountryName", CountryName);
 
             try
             {
                 connection.Open();
-
                 SqlDataReader reader = command.ExecuteReader();
 
                 if (reader.Read())
                 {
+
+                    // The record was found
                     isFound = true;
-                    CountryNameFound = (string)reader["CountryName"];
+
+                    ID = (int)reader["CountryID"];
+
+                    if (reader["Code"] != DBNull.Value)
+                    {
+                        Code = (string)reader["Code"];
+                    }
+                    else
+                    {
+                        Code = "";
+                    }
+
+                    if (reader["PhoneCode"] != DBNull.Value)
+                    {
+                        PhoneCode = (string)reader["PhoneCode"];
+                    }
+                    else
+                    {
+                        PhoneCode = "";
+                    }
+
                 }
+                else
+                {
+                    // The record was not found
+                    isFound = false;
+                }
+
                 reader.Close();
+
+
             }
             catch (Exception ex)
             {
@@ -84,133 +143,137 @@ namespace CountrysDataAccesLayer
             return isFound;
         }
 
-        public static bool IsCountryExist(int CountryID)
+
+        public static int AddNewCountry(string CountryName, string Code, string PhoneCode)
         {
-            bool isExist = false;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = "SELECT found = 1 from Countries WHERE CountryID = @CountryID";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@CountryID", CountryID);
-
-            try
-            {
-                connection.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-
-                isExist = reader.HasRows; // If there are rows, the contact exists
-
-                reader.Close();
-
-            }
-            catch (Exception ex)
-            {
-                // Console.WriteLine("Error: " + ex.Message);
-                isExist = false;
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return isExist;
-
-        }
-
-
-        public static bool IsCountryExist(string CountryName)
-        {
-            bool isExist = false;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = "SELECT found = 1 from Countries WHERE CountryName = @CountryName";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@CountryName", CountryName);
-
-            try
-            {
-                connection.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-
-                isExist = reader.HasRows; // If there are rows, the contact exists
-
-                reader.Close();
-
-            }
-            catch (Exception ex)
-            {
-                // Console.WriteLine("Error: " + ex.Message);
-                isExist = false;
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return isExist;
-
-        }
-
-        public static int AddNewCountry(string CountryName)
-        {
+            //this function will return the new contact id if succeeded and -1 if not.
             int CountryID = -1;
+
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = @"INSERT INTO Countries (CountryName) OUTPUT INSERTED.CountryID VALUES (@CountryName);   
-                            SELECT SCOPE_IDENTITY()";
+
+            string query = @"INSERT INTO Countries (CountryName,Code,PhoneCode)
+                             VALUES (@CountryName,@Code,@PhoneCode);
+                             SELECT SCOPE_IDENTITY();";
 
             SqlCommand command = new SqlCommand(query, connection);
+
             command.Parameters.AddWithValue("@CountryName", CountryName);
+
+            if (Code != "")
+                command.Parameters.AddWithValue("@Code", Code);
+            else
+                command.Parameters.AddWithValue("@Code", System.DBNull.Value);
+
+            if (PhoneCode != "")
+                command.Parameters.AddWithValue("@PhoneCode", PhoneCode);
+            else
+                command.Parameters.AddWithValue("@PhoneCode", System.DBNull.Value);
+
+
             try
             {
                 connection.Open();
-                CountryID = (int)command.ExecuteScalar(); // Get the inserted ID
+
+                object result = command.ExecuteScalar();
+
+
+                if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                {
+                    CountryID = insertedID;
+                }
             }
+
             catch (Exception ex)
             {
                 //Console.WriteLine("Error: " + ex.Message);
-                CountryID = -1;
+
             }
+
             finally
             {
                 connection.Close();
             }
+
+
             return CountryID;
         }
 
-        public static bool UpdateCountry(int CountryID, string CountryName)
+        public static bool UpdateCountry(int ID, string CountryName, string Code, string PhoneCode)
         {
-            int rowsAffected = 0;
 
+            int rowsAffected = 0;
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = @"UPDATE Countries SET CountryName = @CountryName WHERE CountryID = @CountryID";
+            string query = @"Update  Countries  
+                            set CountryName=@CountryName,
+                                Code=@Code,
+                                PhoneCode=@PhoneCode
+                                where CountryID = @CountryID";
 
             SqlCommand command = new SqlCommand(query, connection);
 
+            command.Parameters.AddWithValue("@CountryID", ID);
             command.Parameters.AddWithValue("@CountryName", CountryName);
+            command.Parameters.AddWithValue("@Code", Code);
+            command.Parameters.AddWithValue("@PhoneCode", PhoneCode);
 
-            command.Parameters.AddWithValue("@CountryID", CountryID);
             try
             {
                 connection.Open();
-                rowsAffected = command.ExecuteNonQuery(); // Execute the update command
+                rowsAffected = command.ExecuteNonQuery();
+
             }
             catch (Exception ex)
             {
                 //Console.WriteLine("Error: " + ex.Message);
-                rowsAffected = 0;
+                return false;
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+
+            return (rowsAffected > 0);
+        }
+
+        public static DataTable GetAllCountries()
+        {
+
+            DataTable dt = new DataTable();
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = "SELECT * FROM Countries order by CountryName";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            try
+            {
+                connection.Open();
+
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+
+                {
+                    dt.Load(reader);
+                }
+
+                reader.Close();
+
+
+            }
+
+            catch (Exception ex)
+            {
+                // Console.WriteLine("Error: " + ex.Message);
             }
             finally
             {
                 connection.Close();
             }
-            return (rowsAffected > 0);
+
+            return dt;
 
         }
 
@@ -250,40 +313,75 @@ namespace CountrysDataAccesLayer
 
         }
 
-        public  static DataTable GetAllCountries()
+        public static bool IsCountryExist(int ID)
         {
-            DataTable dt = new DataTable();
+            bool isFound = false;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
 
-            string query = "SELECT * FROM Countries";
+            string query = "SELECT Found=1 FROM Countries WHERE CountryID = @CountryID";
 
             SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@CountryID", ID);
 
             try
             {
                 connection.Open();
-
                 SqlDataReader reader = command.ExecuteReader();
 
-                if (reader.HasRows)
-                {
-                    dt.Load(reader);
-                }
+                isFound = reader.HasRows;
 
                 reader.Close();
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                //Console.WriteLine("Error: " + ex.Message);
+                isFound = false;
             }
             finally
             {
                 connection.Close();
             }
 
-            return dt;
+            return isFound;
         }
+
+
+        public static bool IsCountryExist(string CountryName)
+        {
+            bool isFound = false;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+
+            string query = "SELECT Found=1 FROM Countries WHERE CountryName = @CountryName";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@CountryName", CountryName);
+
+            try
+            {
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                isFound = reader.HasRows;
+
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Error: " + ex.Message);
+                isFound = false;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return isFound;
+        }
+
+
     }
 }
-
